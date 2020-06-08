@@ -1,11 +1,26 @@
+from abc import ABC, abstractmethod
+from collections import deque
 from dataclasses import dataclass
-from typing import Dict, Set, Iterable
+from typing import Dict, Set, Iterable, Tuple
 
 
 @dataclass
 class NodeInfo:
   adjacent: Set[str]
   is_variable: bool
+
+
+@dataclass
+class StringGraphVisitor(ABC):
+  _var_marks: Tuple[str, str]
+
+  @abstractmethod
+  def visit_roots(self, roots: Iterable[str]):
+    pass
+
+  @abstractmethod
+  def visit_node(self, node: str, info: NodeInfo):
+    pass
 
 
 class StringGraph:
@@ -54,6 +69,22 @@ class StringGraph:
 
   def get_roots(self) -> Set[str]:
     return self._roots
+
+  # breadth first traversal
+  def bfs_visit(self, visitor: StringGraphVisitor):
+    to_visit = set(self._info.keys())
+    visitor.visit_roots(self._roots)
+    q = deque(sorted(self._roots))
+    while q:
+      front = q.popleft()
+      if front in to_visit:
+        info = self._info[front]
+        visitor.visit_node(front, info)
+        to_visit.remove(front)
+
+        for child in sorted(info.adjacent):
+          if child in to_visit:
+            q.append(child)
 
 
 @dataclass

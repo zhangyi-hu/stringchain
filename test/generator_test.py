@@ -1,6 +1,8 @@
+from typing import Set
+
 from pytest import raises
 
-from stringchain.generator import StringGraph, GraphGenerator
+from stringchain.generator import StringGraph, GraphGenerator, StringGraphVisitor, NodeInfo
 
 
 def test_graph_generator():
@@ -56,3 +58,37 @@ def test_string_graph():
 
   assert sg.get_children("foo") == {"bar"}
   assert sg.get_children("bar") == set()
+
+
+class ToStringVisitor(StringGraphVisitor):
+  def __init__(self):
+    self.result = ""
+
+  def visit_roots(self, roots: Set[str]):
+    self.result += "{" + ", ".join(sorted(roots)) + "}\n"
+
+  def visit_node(self, node: str, info: NodeInfo):
+    prefix = "$" if info.is_variable else ""
+    self.result += prefix + node + " -> {" + ", ".join(sorted(info.adjacent)) + "}\n"
+
+
+def test_string_graph_visitor():
+  inputs = """
+  foo. bar. goo. bar. foo
+  goo. one. {two}. bar
+  one . this . that
+  """
+  bm_dump = """{foo, goo, one}
+foo -> {bar}
+goo -> {bar, one}
+one -> {this, two}
+bar -> {foo, goo}
+this -> {that}
+$two -> {bar}
+that -> {}
+"""
+  gg = GraphGenerator()
+  sg = gg.generate(inputs)
+  visitor = ToStringVisitor()
+  sg.bfs_visit(visitor)
+  assert bm_dump == visitor.result
