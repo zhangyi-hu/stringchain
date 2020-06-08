@@ -2,7 +2,8 @@ from typing import Set
 
 from pytest import raises
 
-from stringchain.generator import StringGraph, GraphGenerator, StringGraphVisitor, NodeInfo
+from stringchain.generator import GraphGenerator
+from stringchain.stringgraph import StringGraphVisitor, NodeInfo
 
 
 def test_graph_generator():
@@ -48,16 +49,6 @@ def test_graph_generator_failure():
   with raises(ValueError) as ex:
     gg.generate(inputs)
   assert "bar already defined as a variable, cannot be used as a root." == str(ex.value)
-
-
-def test_string_graph():
-  sg = StringGraph()
-  sg.add_root("foo")
-  sg.add_child("foo", "bar")
-  sg.add_root("bar")
-
-  assert sg.get_children("foo") == {"bar"}
-  assert sg.get_children("bar") == set()
 
 
 class ToStringVisitor(StringGraphVisitor):
