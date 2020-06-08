@@ -1,8 +1,9 @@
+import os
 from typing import Set
 
 from pytest import raises
 
-from stringchain.generator import GraphGenerator
+from stringchain.generator import GraphGenerator, PyCodeGenVisitor
 from stringchain.stringgraph import StringGraphVisitor, NodeInfo
 
 
@@ -83,3 +84,24 @@ that -> {}
   visitor = ToStringVisitor()
   sg.bfs_visit(visitor)
   assert bm_dump == visitor.result
+
+
+def test_python_code_gen_visitor():
+  inputs = """
+  foo. bar. goo. bar. foo
+  goo. one. {two}. bar
+  one . this . that
+  """
+  gg = GraphGenerator()
+  sg = gg.generate(inputs)
+  visitor = PyCodeGenVisitor(gg.var_marks, 'Foo')
+  sg.bfs_visit(visitor)
+  dir_name = os.path.dirname(os.path.realpath(__file__))
+  fname = os.path.join(dir_name, "..", "stringchain", "srcgen", visitor.rootclass_name + ".py")
+  with open(fname, "w") as out:
+    out.write(visitor.build())
+
+  from stringchain.srcgen.FooBuilder import FooBuilder
+  builder = FooBuilder()
+  res = FooBuilder.build(builder.goo.bar.goo)
+  print(res)
