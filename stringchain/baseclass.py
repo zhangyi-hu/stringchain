@@ -27,7 +27,7 @@ class StringTreeNode(ABC):
   _variable_mark_right: ClassVar[str] = "}"
 
   def path(self) -> Tuple[str, ...]:
-    if self._value is None:  # only possible when this node is the root
+    if self._value is None:  # only possible when this node is the builder
       return ()
 
     # surround this node with variable marks to mark it as an variable

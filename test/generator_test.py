@@ -101,7 +101,17 @@ def test_python_code_gen_visitor():
   with open(fname, "w") as out:
     out.write(visitor.build())
 
+
+def test_string_chain_builder():
   from stringchain.srcgen.FooBuilder import FooBuilder
   builder = FooBuilder()
-  res = FooBuilder.build(builder.goo.bar.goo)
-  print(res)
+  with raises(ValueError) as ex:
+    FooBuilder.build(builder.goo.one.two.bar)
+  assert "Unassigned variables: {two}" == str(ex.value)
+
+  with raises(ValueError) as ex:
+    FooBuilder.build(builder.goo.one.two.bar, goo=123)
+  assert "Variable {goo} not present in string chain: goo.one.{two}.bar" == str(ex.value)
+
+  res = FooBuilder.build(builder.goo.one.two.bar, two=123)
+  assert "goo.one.123.bar" == res
