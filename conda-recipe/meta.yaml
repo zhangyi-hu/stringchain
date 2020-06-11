@@ -1,0 +1,14 @@
+package:
+  name: stringchain
+  version: "0.8"
+
+source:
+  path: $RECIPE_DIR/../..
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python >=3.7
