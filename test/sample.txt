@@ -1,0 +1,14 @@
+us.{zipcode}.temperature.average
+us.{zipcode}.humidity.average
+ca.{zipcode}.temperature.average
+ca.{zipcode}.humidity.average
+
+us.{zipcode}.temperature.max
+us.{zipcode}.humidity.max
+ca.{zipcode}.temperature.max
+ca.{zipcode}.humidity.max
+
+us.{zipcode}.temperature.min
+us.{zipcode}.humidity.min
+ca.{zipcode}.temperature.min
+ca.{zipcode}.humidity.min

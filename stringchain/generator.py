@@ -1,4 +1,6 @@
+import argparse
 from dataclasses import dataclass
+from os import path
 from typing import Iterable
 
 from stringchain.stringgraph import StringGraph, StringGraphVisitor, NodeInfo
@@ -66,6 +68,7 @@ class PyCodeGenVisitor(StringGraphVisitor):
     self.baseclass_name = "AbstractTreeNode"
     self.rootclass_name = f"{self.name}Builder"  # this is the class that the user will be using
     self.blocks = ["\n".join((  # code blocks that will grow when visiting a given string graph
+      "# pylint: skip-file",
       "import re",
       "from abc import ABC",
       "from dataclasses import dataclass",
@@ -138,3 +141,26 @@ class PyCodeGenVisitor(StringGraphVisitor):
       "",
       ""
     )))
+
+
+# a command line tool to generate string chain graph module from a file of string chain samples
+def generate():
+  parser = argparse.ArgumentParser()
+  parser.add_argument("input_file", help="The input file containing the sample string chains", type=str)
+  parser.add_argument("module", help="The name of module that will be generated", type=str)
+  parser.add_argument("-o", "--outdir", help="The directory to save the generated module file module_name.py",
+                      type=str, default=".")
+  args = parser.parse_args()
+
+  # 1) process the string chain samples in the input file
+  with open(args.input_file, "r") as infile:
+    samples: str = infile.read()
+  gg = GraphGenerator()
+  code_gen = PyCodeGenVisitor(gg.var_marks, args.module)
+  string_graph = gg.generate(samples)
+  string_graph.bfs_visit(code_gen)
+
+  # 2) generate the module file and save to the specified location
+  outfile = path.join(args.outdir, args.module + ".py")
+  with open(outfile, "w") as out:
+    out.write(code_gen.build())

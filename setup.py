@@ -10,5 +10,6 @@ setup(
   author='Zhangyi Hu',
   author_email='hu.zhangyi@gmail.com',
   description=('Grammartize a given set of delimited string chains. '
-               'Eliminate typo or invalid combinations when preparing such values.')
+               'Eliminate typo or invalid combinations when preparing such values.'),
+  entry_points={"console_scripts": ["stringchain = stringchain.generator:generate"]}
 )
