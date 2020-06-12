@@ -1,2 +1,3 @@
 srcgen/
+dist/
 *.egg-info/
