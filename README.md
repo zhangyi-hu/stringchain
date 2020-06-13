@@ -7,3 +7,7 @@ Dependency:
 Install:
 
     conda install -c zhangyi-hu stringchain
+
+Usage:
+
+![](demo/demo.gif)
