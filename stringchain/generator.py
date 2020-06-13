@@ -164,3 +164,4 @@ def generate():
   outfile = path.join(args.outdir, args.module + ".py")
   with open(outfile, "w") as out:
     out.write(code_gen.build())
+  print(f"module file {outfile} generated")
